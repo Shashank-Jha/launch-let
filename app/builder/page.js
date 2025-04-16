@@ -1,6 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
+import { Maximize2, Minimize2 } from 'lucide-react'
+import classNames from 'classnames'
+import FormBuilder from './components/FormBuilder'
+import LiveBuilder from './components/LiveBuilder'
 
 export default function Builder() {
   const [formData, setFormData] = useState({
@@ -9,43 +14,37 @@ export default function Builder() {
     paragraph: 'Describe your product here...'
   })
 
+  const [fullscreen, setFullscreen] = useState(false)
+
   return (
-    <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
-      <div className="p-8 bg-gray-50">
-        <form className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Title</label>
-            <input
-              type="text"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full p-2 border rounded"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Tagline</label>
-            <input
-              type="text"
-              value={formData.tagline}
-              onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
-              className="w-full p-2 border rounded"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Paragraph</label>
-            <textarea
-              value={formData.paragraph}
-              onChange={(e) => setFormData({ ...formData, paragraph: e.target.value })}
-              className="w-full p-2 border rounded h-32"
-            />
-          </div>
-        </form>
-      </div>
-      <div className="p-8">
-        <h1 className="text-3xl font-bold mb-2">{formData.title}</h1>
-        <h2 className="text-xl text-blue-600 mb-4">{formData.tagline}</h2>
-        <p>{formData.paragraph}</p>
-      </div>
+    <div className="min-h-screen bg-gray-100">
+      {!fullscreen ? (
+        <PanelGroup direction="horizontal" className="min-h-screen">
+          <Panel defaultSize={45} className="bg-gray-50">
+            <FormBuilder formData={formData} setFormData={setFormData} />
+          </Panel>
+          <PanelResizeHandle className="w-2 bg-gray-300 cursor-col-resize" />
+          <Panel defaultSize={55} className="relative p-6">
+            <button
+              className="absolute top-4 right-4 bg-white p-2 border rounded shadow hover:bg-gray-50"
+              onClick={() => setFullscreen(true)}
+            >
+              <Maximize2 size={16} />
+            </button>
+            <LiveBuilder formData={formData} />
+          </Panel>
+        </PanelGroup>
+      ) : (
+        <div className="fixed inset-0 bg-white z-50 p-6 overflow-auto">
+          <button
+            className="absolute top-4 right-4 bg-white p-2 border rounded shadow hover:bg-gray-50"
+            onClick={() => setFullscreen(false)}
+          >
+            <Minimize2 size={16} />
+          </button>
+          <LiveBuilder formData={formData} />
+        </div>
+      )}
     </div>
   )
 }
